@@ -107,10 +107,59 @@ suicides_by_year <- suicides %>%
   #filter(year == 2012) %>% #w celu sprawdzenia np. dla 2012
   group_by(year) %>%
   summarise(
-    sum_suicides_per_100k = sum(suicides.100k.pop, na.rm = TRUE)
-  ) %>%
-  ungroup()
+    total_suicides = sum(suicides_no, na.rm = TRUE),
+    total_population = sum(population, na.rm = TRUE),
+    suicides_per_100k = total_suicides / total_population * 100000,
+    .groups = "drop"
+  ) 
 # wynik
 suicides_by_year
-  
+#3.3 Łączna liczba samobójstw na 100k w podziale na płeć i wiek
+suicides_by_sex_age <- suicides %>%
+  group_by(sex, age) %>%
+  summarise(
+    total_suicides = sum(suicides_no, na.rm = TRUE),
+    total_population = sum(population, na.rm = TRUE),
+    suicides_per_100k = total_suicides / total_population * 100000,
+    .groups = "drop"
+  ) 
+suicides_by_sex_age
+
+#3.4: Top 3 kraje z największą liczbą samobójstw w każdym roku
+top3_countries_by_year <- suicides %>%
+  group_by(year, country) %>%
+  summarise(
+    total_suicides = sum(suicides_no, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  group_by(year) %>%
+  arrange(year, desc(total_suicides)) %>%
+  slice_head(n = 3) %>%
+  ungroup()
+
+# wynik
+top3_countries_by_year
+
+#3.5 Kraj z największą / najmniejszą zmianą ilości samobójstw w ciągu roku
+suicides_change <- suicides %>%
+  group_by(country) %>%
+  summarise(
+    max_suicides_per_100k = max(suicides.100k.pop, na.rm = TRUE),
+    min_suicides_per_100k = min(suicides.100k.pop, na.rm = TRUE),
+    change = max_suicides_per_100k - min_suicides_per_100k,
+    .groups = "drop"
+  ); suicides_change
+
+# Kraj z największą zmianą
+max_country_change <- suicides_change %>%
+  arrange(desc(change)) %>%
+  slice_head(n=1)
+# Kraj z najmniejszą zmianą
+min_country_change <- suicides_change %>%
+  arrange(change) %>%
+  slice_head(n=1)
+
+# Wyniki
+max_country_change
+min_country_change
 ```
