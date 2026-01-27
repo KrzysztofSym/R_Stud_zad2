@@ -163,3 +163,70 @@ min_country_change <- suicides_change %>%
 max_country_change
 min_country_change
 ```
+Zad. 4
+```{r}
+free_apps  <- readRDS("gapps/free_apps.rds")
+paid_apps  <- readRDS("gapps/paid_apps.rds")
+norat_apps <- readRDS("gapps/norat_apps.rds")
+
+library(dplyr)
+# Dodanie informacji o typie aplikacji
+free_apps <- free_apps %>% mutate(Type = "Free", Price = 0)
+paid_apps <- paid_apps %>% mutate(Type = "Paid")
+norat_apps <- norat_apps %>% mutate(Type = "No_rating")
+class(free_apps$Price)
+
+# Połączenie danych
+all_apps <- bind_rows(free_apps, paid_apps, norat_apps)
+
+# Zapis połączonego pliku
+write.csv(all_apps, "gapps/all_apps.csv", row.names = FALSE)
+
+head(all_apps)
+str(all_apps)
+```
+Zad. 5
+```{r}
+movies <- readRDS("movies/movies.rds")
+ratings <- readRDS("movies/ratings.rds")
+tags <- readRDS("movies/tags.rds")
+
+library(dplyr)
+#5.1 Agregacja ocen
+ratings_summary <- ratings %>%
+  group_by(movieId) %>%
+  summarise(
+    avg_rating = round(1),
+    n_ratings = n(),
+    .groups = "drop"
+  )
+
+movies <- movies %>%
+  left_join(ratings_summary, by = "movieId")
+head(movies)
+
+#5.2 Czas dodania ostatniego tagu
+last_tag <- tags %>%
+  group_by(movieId) %>%
+  summarise(
+    last_tag_time = max(timestamp),
+    .groups = "drop"
+  )
+last_tag
+
+movies <- movies %>%
+  left_join(last_tag, by = "movieId")
+head(movies)
+
+#5.3 Agregacja tagów
+tags_summary <- tags %>%
+  group_by(movieId) %>%
+  summarise(
+    all_tags = paste(unique(tag), collapse = ", "),
+    .groups = "drop"
+  )
+
+movies <- movies %>%
+  left_join(tags_summary, by = "movieId")
+head(movies, 15)
+```
