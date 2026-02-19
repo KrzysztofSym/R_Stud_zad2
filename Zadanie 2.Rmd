@@ -196,7 +196,7 @@ library(dplyr)
 ratings_summary <- ratings %>%
   group_by(movieId) %>%
   summarise(
-    avg_rating = round(1),
+    avg_rating = round(mean(rating, na.rm = TRUE), 2),
     n_ratings = n(),
     .groups = "drop"
   )
