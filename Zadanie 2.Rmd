@@ -155,9 +155,15 @@ max_country_change <- suicides_change %>%
   arrange(desc(change)) %>%
   slice_head(n=1)
 # Kraj z najmniejszą zmianą
+# min_country_change <- suicides_change %>%
+#   arrange(change) %>%
+#   slice_head(n=1)
+min_change_value <- min(suicides_change$change)
+
 min_country_change <- suicides_change %>%
-  arrange(change) %>%
-  slice_head(n=1)
+  filter(change == min_change_value)
+
+min_country_change
 
 # Wyniki
 max_country_change
